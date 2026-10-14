@@ -1,6 +1,6 @@
 # Oshicue Kit for Android
 
-[简体中文](README.md) | [English](README.en.md)
+[简体中文](README.md) | [繁體中文](README.zh-Hant.md) | [繁體粵語](README.zh-HK.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [ไทย](README.th.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md)
 
 原生 Android 应用（Kotlin + Jetpack Compose），用于查看活动时间表、记录物贩消费和整理活动日志。四个页签依次为时间表、手账、日志、设置。当前版本为 **0.4.0（versionCode 10）**，与 iOS 版 Oshicue Kit 0.4.0（build 10）功能对齐，支持 Android 8.0（API 26）及以上。
 

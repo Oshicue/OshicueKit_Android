@@ -1,6 +1,6 @@
 # Oshicue Kit for Android
 
-[简体中文](README.md) | [English](README.en.md)
+[简体中文](README.md) | [繁體中文](README.zh-Hant.md) | [繁體粵語](README.zh-HK.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [ไทย](README.th.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md)
 
 A native Android app (Kotlin + Jetpack Compose) for event timetables, merchandise spending, and event recaps. Its four tabs are Timetable, Ledger, Diary, and Settings. The current version is **0.4.0 (versionCode 10)**, feature-aligned with the iOS app Oshicue Kit 0.4.0 (build 10), and supports Android 8.0 (API 26) or later.
 
