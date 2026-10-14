@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "groups": [
+    { "id": "luna", "name": "LUNA NOTE" },
+    { "id": "prism", "name": "PRISM DAYS" }
+  ],
+  "members": [
+    { "id": "mio", "name": "Mio" },
+    { "id": "rina", "name": "Rina" }
+  ],
+  "products": [
+    { "id": "cheki", "name": "Cheki" },
+    { "id": "wide-cheki", "name": "WIDE Cheki" },
+    { "id": "phone-photo", "name": "Phone photo" }
+  ],
+  "memberships": [
+    {
+      "id": "mio-luna", "memberID": "mio", "groupID": "luna", "color": "#F28AAF",
+      "prices": [
+        { "productID": "cheki", "currency": "JPY", "unitPriceMinor": 2000 },
+        { "productID": "wide-cheki", "currency": "JPY", "unitPriceMinor": 3500 },
+        { "productID": "phone-photo", "currency": "JPY", "unitPriceMinor": 1500 }
+      ]
+    },
+    {
+      "id": "mio-prism", "memberID": "mio", "groupID": "prism", "color": "#9B8CF5",
+      "prices": [{ "productID": "cheki", "currency": "JPY", "unitPriceMinor": 2500 }]
+    },
+    {
+      "id": "rina-luna", "memberID": "rina", "groupID": "luna", "color": "#66C7A5",
+      "prices": [{ "productID": "phone-photo", "currency": "CNY", "unitPriceMinor": 8000 }]
+    }
+  ],
+  "events": [
+    {
+      "id": "mini-fes-20261014", "name": "Oshicue Mini Fes", "date": "2026-10-14",
+      "city": "Tokyo", "venue": "Luna Hall", "address": "Shibuya, Tokyo"
+    }
+  ],
+  "records": [
+    {
+      "id": "purchase-001", "date": "2026-10-14",
+      "memberID": "mio", "groupID": "luna", "productID": "cheki",
+      "quantity": 5, "unitPriceMinor": 2000, "currency": "JPY", "eventID": "mini-fes-20261014",
+      "memberNameSnapshot": "Mio", "groupNameSnapshot": "LUNA NOTE",
+      "productNameSnapshot": "Cheki", "colorSnapshot": "#F28AAF",
+      "eventNameSnapshot": "Oshicue Mini Fes", "citySnapshot": "Tokyo",
+      "venueSnapshot": "Luna Hall", "addressSnapshot": "Shibuya, Tokyo",
+      "note": "示例记录：请替换为自己的消费"
+    },
+    {
+      "id": "purchase-002", "date": "2026-10-14",
+      "memberID": "mio", "groupID": "prism", "productID": "cheki",
+      "quantity": 2, "unitPriceMinor": 2500, "currency": "JPY",
+      "memberNameSnapshot": "Mio", "groupNameSnapshot": "PRISM DAYS",
+      "productNameSnapshot": "Cheki", "colorSnapshot": "#9B8CF5"
+    },
+    {
+      "id": "purchase-003", "date": "2026-10-15",
+      "memberID": "rina", "groupID": "luna", "productID": "phone-photo",
+      "quantity": 1, "unitPriceMinor": 8000, "currency": "CNY",
+      "memberNameSnapshot": "Rina", "groupNameSnapshot": "LUNA NOTE",
+      "productNameSnapshot": "Phone photo", "colorSnapshot": "#66C7A5",
+      "citySnapshot": "Shanghai"
+    }
+  ]
+}
