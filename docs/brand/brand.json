@@ -1,0 +1,9 @@
+{
+  "sourceFont": "OshicueKit/Resources/Fonts/Unbounded.ttf",
+  "postScriptName": "Unbounded-Regular",
+  "renderedVariationName": "Unbounded-Regular_Black",
+  "weight": 900,
+  "trackingEm": 0.02,
+  "colors": { "background": "#0a0a0d", "ink": "#f4f3ee", "accent": "#ff3d6e" },
+  "wordmarkSize": { "width": 948, "height": 133 }
+}

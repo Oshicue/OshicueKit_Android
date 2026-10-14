@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "readability-festival",
+      "name": "TIMETABLE READABILITY FEST",
+      "city": "Nagoya",
+      "timeZone": "Asia/Tokyo",
+      "venues": [
+        { "id": "readability-hall", "name": "NAGOYA ReNY limited", "color": "#177DB4" }
+      ],
+      "artists": [
+        { "id": "artist-1", "name": "僕と契約してライブ信者になってよ。" },
+        { "id": "artist-2", "name": "The Extremely Long Idol Orchestra Name" },
+        { "id": "artist-3", "name": "ゼノシンフォニーと夜明けのパレード" },
+        { "id": "artist-4", "name": "CENTRAL STAGE SUPER IDOL PROJECT" },
+        { "id": "artist-5", "name": "LEIWAN" }
+      ],
+      "sessions": [
+        { "id": "live-5min", "artistID": "artist-1", "venueID": "readability-hall", "kind": "live", "startsAt": "2026-06-14T12:00:00+09:00", "endsAt": "2026-06-14T12:05:00+09:00" },
+        { "id": "live-10min", "artistID": "artist-2", "venueID": "readability-hall", "kind": "live", "startsAt": "2026-06-14T12:05:00+09:00", "endsAt": "2026-06-14T12:15:00+09:00" },
+        { "id": "live-short-name", "artistID": "artist-5", "venueID": "readability-hall", "kind": "live", "startsAt": "2026-06-14T12:15:00+09:00", "endsAt": "2026-06-14T12:20:00+09:00" },
+        { "id": "goods-1", "artistID": "artist-1", "venueID": "readability-hall", "kind": "goods", "startsAt": "2026-06-14T12:00:00+09:00", "endsAt": "2026-06-14T13:10:00+09:00" },
+        { "id": "goods-2", "artistID": "artist-2", "venueID": "readability-hall", "kind": "goods", "startsAt": "2026-06-14T12:00:00+09:00", "endsAt": "2026-06-14T13:10:00+09:00" },
+        { "id": "goods-3", "artistID": "artist-3", "venueID": "readability-hall", "kind": "goods", "startsAt": "2026-06-14T12:00:00+09:00", "endsAt": "2026-06-14T13:10:00+09:00" },
+        { "id": "goods-4", "artistID": "artist-4", "venueID": "readability-hall", "kind": "goods", "startsAt": "2026-06-14T12:00:00+09:00", "endsAt": "2026-06-14T13:10:00+09:00" }
+      ]
+    }
+  ]
+}

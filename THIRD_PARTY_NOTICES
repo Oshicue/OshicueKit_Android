@@ -1,0 +1,19 @@
+Oshicue Kit — third-party notices
+
+The project's original source code, documentation, templates and generated
+brand assets are licensed under the MIT License in LICENSE. Third-party
+components retain their own licenses.
+
+Unbounded font
+--------------
+Files: OshicueKit/Resources/Fonts/Unbounded.ttf
+Copyright: 2022 The Unbounded Project Authors
+Upstream: https://github.com/googlefonts/unbounded
+License: SIL Open Font License 1.1
+Full license and copyright notice: OshicueKit/Resources/Fonts/OFL.txt
+
+The bundled font is distributed under its original OFL license, not MIT.
+The wordmark and app icon are generated with this font; their generation
+script is scripts/generate_brand.swift.
+
+MIT license reference: https://opensource.org/license/mit
