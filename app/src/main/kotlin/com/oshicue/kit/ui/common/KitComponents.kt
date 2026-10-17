@@ -23,7 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -200,6 +203,41 @@ fun KitSectionCard(modifier: Modifier = Modifier, content: @Composable ColumnSco
             .padding(16.dp),
         content = content
     )
+}
+
+/** A demo card: headline title, a subtle action button and a caption hint, optionally with an inline error. */
+@Composable
+fun KitDemoSection(
+    title: String,
+    actionLabel: String,
+    hint: String,
+    icon: ImageVector,
+    error: String? = null,
+    onAction: () -> Unit
+) {
+    val palette = kitPalette()
+    Column(
+        modifier = Modifier.fillMaxWidth().background(palette.surface, RoundedCornerShape(16.dp)).padding(18.dp),
+        verticalArrangement = Arrangement.spacedBy(13.dp)
+    ) {
+        Text(title, color = palette.ink, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+        Button(
+            onClick = onAction,
+            colors = ButtonDefaults.buttonColors(containerColor = palette.surfaceMuted, contentColor = palette.ink),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(actionLabel, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        }
+        Text(hint, color = palette.muted, fontSize = 12.sp)
+        error?.let { message ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Icon(Icons.Filled.Warning, contentDescription = null, tint = palette.warningText, modifier = Modifier.size(14.dp))
+                Text(message, color = palette.warningText, fontSize = 12.sp)
+            }
+        }
+    }
 }
 
 @Composable

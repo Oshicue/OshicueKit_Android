@@ -277,7 +277,7 @@ fun TimelineBoard(
             }
             Column(
                 modifier = Modifier
-                    .width(viewportWidth - railWidth)
+                    .width((viewportWidth - railWidth).coerceAtLeast(1.dp))
                     .verticalScroll(vertical)
                     .horizontalScroll(horizontal)
             ) {
@@ -310,7 +310,7 @@ fun TimelineBoard(
                             val laneWidth = contentWidth / placement.laneCount
                             SessionBlock(
                                 entry = entry,
-                                favorite = favorites.contains(entry.session.artistID),
+                                favorite = favorites.contains(entry.id),
                                 merged = true,
                                 width = (laneWidth - 6.dp).coerceAtLeast(1.dp),
                                 height = blockHeight(entry),
@@ -332,7 +332,7 @@ fun TimelineBoard(
                                 val placement = placements[entry.id] ?: continue
                                 SessionBlock(
                                     entry = entry,
-                                    favorite = favorites.contains(entry.session.artistID),
+                                    favorite = favorites.contains(entry.id),
                                     merged = false,
                                     width = (placement.relativeWidth * trackWidth.value).dp - 6.dp,
                                     height = blockHeight(entry),

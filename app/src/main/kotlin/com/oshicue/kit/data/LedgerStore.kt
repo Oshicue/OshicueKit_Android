@@ -16,6 +16,8 @@ import com.oshicue.kit.core.LedgerGroup
 import com.oshicue.kit.core.LedgerImporter
 import com.oshicue.kit.core.LedgerMember
 import com.oshicue.kit.core.LedgerMembership
+import com.oshicue.kit.core.LedgerPrice
+import com.oshicue.kit.core.LedgerPriceSuggestions
 import com.oshicue.kit.core.LedgerProduct
 import com.oshicue.kit.core.LedgerRecord
 import com.oshicue.kit.core.activeGroups
@@ -27,6 +29,8 @@ import com.oshicue.kit.core.deletingMembers
 import com.oshicue.kit.core.deletingGroup
 import com.oshicue.kit.core.deletingRecords
 import com.oshicue.kit.i18n.L10n
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import java.io.File
@@ -36,6 +40,8 @@ class LedgerStore(private val context: Context) {
     var document: LedgerDocument by mutableStateOf(LedgerDocument(products = LedgerDocument.defaultProducts))
         private set
     var isDemo: Boolean by mutableStateOf(false)
+        private set
+    var lastAddedPrices: List<LedgerPrice> by mutableStateOf(emptyList())
         private set
     var storageError: String? by mutableStateOf(null)
     private var hasUserEdits = false
@@ -55,6 +61,8 @@ class LedgerStore(private val context: Context) {
                 document = parsed
                 isDemo = demoValue == "true"
                 hasUserEdits = ((root["hasUserEdits"] as? JsonPrimitive)?.content ?: "false") == "true"
+                lastAddedPrices = decodePrices(root["lastAddedPrices"])
+                    ?: LedgerPriceSuggestions.seededPrices(parsed.records)
             } catch (error: Exception) {
                 unreadableFile = true
                 storageError = L10n.text("settings.readError") + "\n" + message(error)
@@ -62,8 +70,9 @@ class LedgerStore(private val context: Context) {
         } else {
             document = LedgerDemo.document()
             isDemo = true
+            lastAddedPrices = LedgerPriceSuggestions.seededPrices(document.records)
             try {
-                persist(document, demo = true, userEdits = false)
+                persist(document, demo = true, userEdits = false, prices = lastAddedPrices)
             } catch (error: Exception) {
                 storageError = message(error)
             }
@@ -72,11 +81,16 @@ class LedgerStore(private val context: Context) {
 
     /** Validates the complete candidate and atomically persists it before updating observers. */
     fun transaction(update: (LedgerDocument) -> LedgerDocument) {
+        transaction(update, lastAddedPrices)
+    }
+
+    private fun transaction(update: (LedgerDocument) -> LedgerDocument, prices: List<LedgerPrice>) {
         val candidate = update(document)
         val userEdits = hasUserEdits || isDemo
-        persist(candidate, demo = isDemo, userEdits = userEdits)
+        persist(candidate, demo = isDemo, userEdits = userEdits, prices = prices)
         document = candidate
         hasUserEdits = userEdits
+        lastAddedPrices = prices
         storageError = null
     }
 
@@ -100,10 +114,12 @@ class LedgerStore(private val context: Context) {
             // Preserve edits to the initial examples when importing additional records.
             val includesDemo = isDemo && !replaceDemo
             val userEdits = includesDemo && hasUserEdits
-            persist(candidate, demo = includesDemo, userEdits = userEdits)
+            val prices = if (replaceDemo) LedgerPriceSuggestions.seededPrices(candidate.records) else lastAddedPrices
+            persist(candidate, demo = includesDemo, userEdits = userEdits, prices = prices)
             document = candidate
             isDemo = includesDemo
             hasUserEdits = userEdits
+            lastAddedPrices = prices
             storageError = null
             true
         } catch (error: Exception) {
@@ -123,10 +139,12 @@ class LedgerStore(private val context: Context) {
         }
         return try {
             val candidate = LedgerDemo.document()
-            persist(candidate, demo = true, userEdits = false)
+            val prices = LedgerPriceSuggestions.seededPrices(candidate.records)
+            persist(candidate, demo = true, userEdits = false, prices = prices)
             document = candidate
             isDemo = true
             hasUserEdits = false
+            lastAddedPrices = prices
             storageError = null
             true
         } catch (error: Exception) {
@@ -182,7 +200,24 @@ class LedgerStore(private val context: Context) {
         if (!keepsHistoricalAffiliation &&
             document.activeMemberships.none { it.memberID == value.memberID && it.groupID == value.groupID }
         ) return unavailableCatalog()
-        return commit { it.copy(records = upsertBy(value, it.records) { item -> item.id }) }
+        val prices = if (original == null) {
+            LedgerPriceSuggestions.remembering(
+                LedgerPrice(value.productID, value.currency, value.unitPriceMinor),
+                lastAddedPrices
+            )
+        } else {
+            lastAddedPrices
+        }
+        return try {
+            transaction(
+                { it.copy(records = upsertBy(value, it.records) { item -> item.id }) },
+                prices
+            )
+            true
+        } catch (error: Exception) {
+            storageError = message(error)
+            false
+        }
     }
 
     fun deleteRecord(id: String): Boolean = commit { it.copy(records = it.records.filter { record -> record.id != id }) }
@@ -211,7 +246,12 @@ class LedgerStore(private val context: Context) {
         return false
     }
 
-    private fun persist(candidate: LedgerDocument, demo: Boolean, userEdits: Boolean) {
+    private fun persist(
+        candidate: LedgerDocument,
+        demo: Boolean,
+        userEdits: Boolean,
+        prices: List<LedgerPrice> = lastAddedPrices
+    ) {
         LedgerImporter.validate(candidate)
         if (unreadableFile && file.exists()) {
             KitFiles.backUpUnreadable(file)
@@ -221,7 +261,30 @@ class LedgerStore(private val context: Context) {
         root.putElement("document", LedgerImporter.encodeElement(candidate))
         root.put("hasUserEdits", userEdits)
         root.put("isDemo", demo)
+        root.putArray("lastAddedPrices", prices.map { price ->
+            JObj().apply {
+                put("currency", price.currency)
+                put("productID", price.productID)
+                put("unitPriceMinor", price.unitPriceMinor)
+            }.build()
+        })
         KitFiles.writeAtomic(file, JsonText.encode(root.build()).toByteArray(Charsets.UTF_8))
+    }
+
+    private fun decodePrices(element: JsonElement?): List<LedgerPrice>? {
+        if (element == null || element is kotlinx.serialization.json.JsonNull) return null
+        val array = element as? JsonArray ?: throw IllegalStateException("Invalid price memory")
+        return array.map { value ->
+            val obj = value.jsonObject
+            val currency = (obj["currency"] as? JsonPrimitive)?.takeIf { it.isString }?.content
+                ?: throw IllegalStateException("Invalid price memory")
+            val productID = (obj["productID"] as? JsonPrimitive)?.takeIf { it.isString }?.content
+                ?: throw IllegalStateException("Invalid price memory")
+            val unitPrice = (obj["unitPriceMinor"] as? JsonPrimitive)
+                ?.takeIf { !it.isString }?.content?.toLongOrNull()
+                ?: throw IllegalStateException("Invalid price memory")
+            LedgerPrice(productID, currency, unitPrice)
+        }
     }
 
     private fun message(error: Exception): String {

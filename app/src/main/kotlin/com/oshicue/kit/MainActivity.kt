@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         val stores = KitApplication.stores(this)
         setContent {
             OshicueKitTheme {
-                RootScreen(stores.scheduleStore, stores.ledgerStore, stores.diaryStore)
+                RootScreen(stores.scheduleStore, stores.ledgerStore, stores.diaryStore, stores.agendaStore)
             }
         }
     }

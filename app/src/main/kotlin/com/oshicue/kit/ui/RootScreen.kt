@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.StickyNote2
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -23,10 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import com.oshicue.kit.data.AgendaStore
 import com.oshicue.kit.data.DiaryStore
 import com.oshicue.kit.data.LedgerStore
 import com.oshicue.kit.data.ScheduleStore
 import com.oshicue.kit.i18n.L10n
+import com.oshicue.kit.ui.agenda.AgendaScreen
 import com.oshicue.kit.ui.common.KitMessageAlert
 import com.oshicue.kit.ui.diary.DiaryScreen
 import com.oshicue.kit.ui.ledger.LedgerScreen
@@ -34,31 +37,42 @@ import com.oshicue.kit.ui.schedule.ScheduleScreen
 import com.oshicue.kit.ui.settings.SettingsScreen
 import com.oshicue.kit.ui.theme.kitPalette
 
-private data class RootTab(val labelKey: String, val icon: ImageVector)
+private data class RootTab(val module: Int, val labelKey: String, val icon: ImageVector)
 
 @Composable
-fun RootScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diaryStore: DiaryStore) {
+fun RootScreen(
+    scheduleStore: ScheduleStore,
+    ledgerStore: LedgerStore,
+    diaryStore: DiaryStore,
+    agendaStore: AgendaStore
+) {
     val context = LocalContext.current
     val palette = kitPalette()
     val preferences = remember(context) { context.getSharedPreferences("oshicue-kit", android.content.Context.MODE_PRIVATE) }
-    var tab by remember { mutableIntStateOf(preferences.getInt("selectedModule", 0)) }
+    var tab by remember {
+        val saved = preferences.getInt("selectedModule", AgendaModule)
+        val restored = if (saved in 0..4) saved else AgendaModule
+        if (restored != saved) preferences.edit().putInt("selectedModule", restored).apply()
+        mutableIntStateOf(restored)
+    }
     val tabs = listOf(
-        RootTab("tab.schedule", Icons.Filled.CalendarMonth),
-        RootTab("ledger.title", Icons.AutoMirrored.Filled.MenuBook),
-        RootTab("diary.title", Icons.AutoMirrored.Filled.StickyNote2),
-        RootTab("settings.title", Icons.Filled.Settings)
+        RootTab(AgendaModule, "agenda.title", Icons.Filled.CalendarMonth),
+        RootTab(0, "tab.schedule", Icons.Filled.Event),
+        RootTab(1, "ledger.title", Icons.AutoMirrored.Filled.MenuBook),
+        RootTab(2, "diary.title", Icons.AutoMirrored.Filled.StickyNote2),
+        RootTab(3, "settings.title", Icons.Filled.Settings)
     )
 
     Scaffold(
         containerColor = palette.background,
         bottomBar = {
             NavigationBar(containerColor = palette.surface) {
-                tabs.forEachIndexed { index, item ->
+                for (item in tabs) {
                     NavigationBarItem(
-                        selected = tab == index,
+                        selected = tab == item.module,
                         onClick = {
-                            tab = index
-                            preferences.edit().putInt("selectedModule", index).apply()
+                            tab = item.module
+                            preferences.edit().putInt("selectedModule", item.module).apply()
                         },
                         icon = { Icon(item.icon, contentDescription = L10n.text(item.labelKey)) },
                         label = { Text(L10n.text(item.labelKey), fontSize = 11.sp) },
@@ -76,10 +90,11 @@ fun RootScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diaryStor
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (tab) {
+                AgendaModule -> AgendaScreen(agendaStore)
                 0 -> ScheduleScreen(scheduleStore)
                 1 -> LedgerScreen(ledgerStore, scheduleStore)
                 2 -> DiaryScreen(diaryStore, ledgerStore)
-                else -> SettingsScreen(scheduleStore, ledgerStore, diaryStore)
+                else -> SettingsScreen(scheduleStore, ledgerStore, diaryStore, agendaStore)
             }
         }
     }
@@ -87,4 +102,9 @@ fun RootScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diaryStor
     scheduleStore.storageError?.let { error ->
         KitMessageAlert(L10n.text("settings.storageError"), error) { scheduleStore.storageError = null }
     }
+    agendaStore.storageError?.let { error ->
+        KitMessageAlert(L10n.text("settings.storageError"), error) { agendaStore.storageError = null }
+    }
 }
+
+private const val AgendaModule = 4

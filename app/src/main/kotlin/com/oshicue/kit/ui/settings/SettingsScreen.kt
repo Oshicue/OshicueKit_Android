@@ -20,9 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,28 +36,34 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.oshicue.kit.BuildConfig
 import com.oshicue.kit.MainActivity
+import com.oshicue.kit.data.AgendaStore
 import com.oshicue.kit.data.DiaryStore
 import com.oshicue.kit.data.LedgerStore
 import com.oshicue.kit.data.ScheduleStore
 import com.oshicue.kit.i18n.AppLanguage
 import com.oshicue.kit.i18n.L10n
 import com.oshicue.kit.ui.common.BrandWordmark
-import com.oshicue.kit.ui.common.KitAlert
 import com.oshicue.kit.ui.common.KitSheet
+import com.oshicue.kit.ui.agenda.AgendaManagementSheet
 import com.oshicue.kit.ui.diary.DiaryManagementSheet
 import com.oshicue.kit.ui.ledger.LedgerManagementSheet
 import com.oshicue.kit.ui.schedule.ImportSheet
 import com.oshicue.kit.ui.theme.kitPalette
 
 @Composable
-fun SettingsScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diaryStore: DiaryStore) {
+fun SettingsScreen(
+    scheduleStore: ScheduleStore,
+    ledgerStore: LedgerStore,
+    diaryStore: DiaryStore,
+    agendaStore: AgendaStore
+) {
     val palette = kitPalette()
     val context = LocalContext.current
     var destination by remember { mutableStateOf<String?>(null) }
     var showLanguage by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    val appVersion = "0.4.0 · 10"
+    val appVersion = BuildConfig.VERSION_NAME + " · " + BuildConfig.VERSION_CODE
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
@@ -79,17 +84,10 @@ fun SettingsScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diary
             ) { showLanguage = true }
         }
         SettingsSection(title = L10n.text("settings.data"), footer = L10n.text("settings.localData")) {
-            SettingsRow(Icons.Filled.CalendarMonth, L10n.text("settings.scheduleImport")) { destination = "schedule" }
+            SettingsRow(Icons.Filled.CalendarMonth, L10n.text("agenda.management")) { destination = "agenda" }
+            SettingsRow(Icons.Filled.Download, L10n.text("settings.scheduleImport")) { destination = "schedule" }
             SettingsRow(Icons.AutoMirrored.Filled.MenuBook, L10n.text("settings.ledgerBackup")) { destination = "ledger" }
             SettingsRow(Icons.Filled.Inventory, L10n.text("settings.diaryBackup")) { destination = "diary" }
-        }
-        SettingsSection(title = L10n.text("settings.demoLabel"), footer = L10n.text("settings.demoHint")) {
-            SettingsRow(Icons.Filled.SmartDisplay, L10n.text("settings.loadDemo")) { scheduleStore.loadDemo() }
-        }
-        SettingsSection(title = L10n.text("ledger.title"), footer = L10n.text("ledger.loadDemoHint")) {
-            SettingsRow(Icons.Filled.Group, L10n.text("settings.ledgerDemo")) {
-                if (!ledgerStore.loadDemo()) error = ledgerStore.storageError
-            }
         }
         SettingsSection(title = L10n.text("settings.about")) {
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -121,19 +119,10 @@ fun SettingsScreen(scheduleStore: ScheduleStore, ledgerStore: LedgerStore, diary
         )
     }
     when (destination) {
+        "agenda" -> AgendaManagementSheet(agendaStore) { destination = null }
         "schedule" -> ImportSheet(scheduleStore) { destination = null }
         "ledger" -> LedgerManagementSheet(ledgerStore) { destination = null }
         "diary" -> DiaryManagementSheet(diaryStore) { destination = null }
-    }
-    error?.let { message ->
-        KitAlert(
-            title = L10n.text("settings.storageError"),
-            message = message,
-            confirmLabel = L10n.text("common.close"),
-            onConfirm = { error = null },
-            onDismiss = { error = null },
-            dismissLabel = L10n.text("common.close")
-        )
     }
 }
 

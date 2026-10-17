@@ -2,6 +2,7 @@ package com.oshicue.kit
 
 import android.app.Application
 import android.content.Context
+import com.oshicue.kit.data.AgendaStore
 import com.oshicue.kit.data.DiaryStore
 import com.oshicue.kit.data.LedgerStore
 import com.oshicue.kit.data.ScheduleStore
@@ -14,6 +15,8 @@ class KitApplication : Application() {
         private set
     lateinit var diaryStore: DiaryStore
         private set
+    lateinit var agendaStore: AgendaStore
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -21,6 +24,7 @@ class KitApplication : Application() {
         scheduleStore = ScheduleStore(this)
         ledgerStore = LedgerStore(this)
         diaryStore = DiaryStore(this)
+        agendaStore = AgendaStore(this)
     }
 
     companion object {

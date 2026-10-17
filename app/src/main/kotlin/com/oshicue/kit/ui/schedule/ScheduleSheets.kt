@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
@@ -67,6 +68,8 @@ import com.oshicue.kit.core.SessionKind
 import com.oshicue.kit.data.ScheduleStore
 import com.oshicue.kit.i18n.L10n
 import com.oshicue.kit.ui.common.KitAlert
+import com.oshicue.kit.ui.common.KitDemoSection
+import com.oshicue.kit.ui.common.KitDivider
 import com.oshicue.kit.ui.common.KitMessageAlert
 import com.oshicue.kit.ui.common.KitSheet
 import com.oshicue.kit.ui.theme.KitDate
@@ -273,6 +276,18 @@ fun ImportSheet(store: ScheduleStore, onClose: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(14.dp))
             Text(L10n.text("import.timeZonesHint"), color = palette.muted, fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+            KitDivider()
+            Spacer(modifier = Modifier.height(20.dp))
+            KitDemoSection(
+                title = L10n.text("settings.demoLabel"),
+                actionLabel = L10n.text("settings.loadDemo"),
+                hint = L10n.text("settings.demoHint"),
+                icon = Icons.Filled.SmartDisplay
+            ) {
+                store.loadDemo()
+                onClose()
+            }
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
@@ -412,7 +427,7 @@ fun SessionDetailSheet(
     onClose: () -> Unit
 ) {
     val palette = kitPalette()
-    val favorite = store.isFavorite(entry.session.artistID)
+    val favorite = store.isFavorite(entry.id)
     KitSheet(L10n.text("schedule.sessionDetails"), onClose) {
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp)) {
             Row(verticalAlignment = Alignment.Top) {
@@ -478,7 +493,7 @@ fun SessionDetailSheet(
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { store.toggleFavorite(entry.session.artistID) },
+                onClick = { store.toggleFavorite(entry.id) },
                 colors = ButtonDefaults.buttonColors(containerColor = palette.surfaceMuted, contentColor = palette.accentText),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth().height(48.dp)

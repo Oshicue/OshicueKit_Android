@@ -4,18 +4,15 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.oshicue.kit.core.JObj
 import com.oshicue.kit.core.JsonText
 import com.oshicue.kit.core.KitJson
 import com.oshicue.kit.core.ScheduleDemo
 import com.oshicue.kit.core.ScheduleDocument
-import com.oshicue.kit.core.ScheduleImporter
+import com.oshicue.kit.core.ScheduleSavedState
 import com.oshicue.kit.core.deletingEvent
+import com.oshicue.kit.core.favoritesForArtistIDs
+import com.oshicue.kit.core.sessionFavoriteIDs
 import com.oshicue.kit.i18n.L10n
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonObject
 import java.io.File
 
 class ScheduleStore(private val context: Context) {
@@ -32,18 +29,13 @@ class ScheduleStore(private val context: Context) {
     init {
         if (file.exists()) {
             try {
-                val root = KitJson.parse(file.readText())?.jsonObject
+                val element = KitJson.parse(file.readText())
                     ?: throw IllegalStateException("Unreadable schedule state")
-                val documentElement = root["document"]
-                    ?: throw IllegalStateException("Missing schedule document")
-                val parsed = ScheduleImporter.parse(JsonText.encode(documentElement))
-                val favoritesValue = root["favorites"] as? JsonArray
-                    ?: throw IllegalStateException("Missing favorites")
-                val demoValue = (root["isDemo"] as? JsonPrimitive)?.content
-                    ?: throw IllegalStateException("Missing demo marker")
-                document = parsed
-                favorites = favoritesValue.mapNotNull { (it as? JsonPrimitive)?.takeIf { value -> value.isString }?.content }.toSet()
-                isDemo = demoValue == "true"
+                val state = ScheduleSavedState.decode(element)
+                document = state.document
+                favorites = state.favorites
+                isDemo = state.isDemo
+                if (state.needsFavoriteMigration) save()
             } catch (error: Exception) {
                 document = ScheduleDocument(events = emptyList())
                 favorites = emptySet()
@@ -53,22 +45,23 @@ class ScheduleStore(private val context: Context) {
         } else {
             val demo = ScheduleDemo.document()
             document = demo
-            favorites = demo.events.firstOrNull()?.artists?.take(2)?.map { it.id }?.toSet() ?: emptySet()
+            favorites = demo.favoritesForArtistIDs(demo.events.firstOrNull()?.artists?.take(2)?.map { it.id }?.toSet() ?: emptySet())
             isDemo = true
             save()
         }
     }
 
-    fun isFavorite(artistID: String): Boolean = artistID in favorites
+    fun isFavorite(sessionID: String): Boolean = sessionID in favorites
 
-    fun toggleFavorite(artistID: String) {
-        favorites = if (artistID in favorites) favorites - artistID else favorites + artistID
+    fun toggleFavorite(sessionID: String) {
+        if (sessionID !in document.sessionFavoriteIDs) return
+        favorites = if (sessionID in favorites) favorites - sessionID else favorites + sessionID
         save()
     }
 
     fun importDocument(incoming: ScheduleDocument) {
         document = if (isDemo) incoming else document.merging(incoming)
-        if (isDemo) favorites = emptySet()
+        favorites = if (isDemo) emptySet() else favorites.intersect(document.sessionFavoriteIDs)
         isDemo = false
         save()
     }
@@ -78,7 +71,7 @@ class ScheduleStore(private val context: Context) {
         val result = document.deletingEvent(id, favorites) ?: return false
         val stillDemo = isDemo && result.document.events.isNotEmpty()
         return try {
-            write(result.document, result.favorites, stillDemo)
+            write(ScheduleSavedState(result.document, result.favorites, stillDemo))
             document = result.document
             favorites = result.favorites
             isDemo = stillDemo
@@ -94,24 +87,20 @@ class ScheduleStore(private val context: Context) {
     fun loadDemo() {
         val demo = ScheduleDemo.document()
         document = document.merging(demo)
+        favorites = favorites.intersect(document.sessionFavoriteIDs)
         if (document.events.size == demo.events.size) isDemo = true
         save()
     }
 
     private fun save() {
         try {
-            write(document, favorites, isDemo)
+            write(ScheduleSavedState(document, favorites, isDemo))
         } catch (error: Exception) {
             storageError = L10n.text("settings.saveError") + "\n" + (error.message ?: error.toString())
         }
     }
 
-    private fun write(document: ScheduleDocument, favorites: Set<String>, isDemo: Boolean) {
-        val documentElement = KitJson.parse(ScheduleImporter.encode(document)) ?: return
-        val root = JObj()
-        root.putElement("document", documentElement)
-        root.putStringSet("favorites", favorites)
-        root.put("isDemo", isDemo)
-        KitFiles.writeAtomic(file, JsonText.encode(root.build()).toByteArray(Charsets.UTF_8))
+    private fun write(state: ScheduleSavedState) {
+        KitFiles.writeAtomic(file, JsonText.encode(state.encode()).toByteArray(Charsets.UTF_8))
     }
 }

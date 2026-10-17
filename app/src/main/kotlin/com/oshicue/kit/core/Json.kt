@@ -34,6 +34,7 @@ class JObj {
     fun put(key: String, value: String) { map[key] = JsonPrimitive(value) }
     fun put(key: String, value: Long) { map[key] = JsonPrimitive(value) }
     fun put(key: String, value: Int) { map[key] = JsonPrimitive(value) }
+    fun put(key: String, value: Double) { map[key] = JsonPrimitive(value) }
     fun put(key: String, value: Boolean) { map[key] = JsonPrimitive(value) }
     fun putString(key: String, value: String?) { if (value != null) put(key, value) }
     fun putElement(key: String, value: JsonElement) { map[key] = value }

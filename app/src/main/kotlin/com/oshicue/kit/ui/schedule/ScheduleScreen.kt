@@ -81,7 +81,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 data class SessionEntry(val event: FestivalEvent, val session: FestivalSession) {
-    val id: String get() = "${event.id.toByteArray(Charsets.UTF_8).size}:${event.id}${session.id}"
+    val id: String get() = com.oshicue.kit.core.ScheduleFavorites.id(event.id, session.id)
     val artist: String get() = event.artist(session.artistID)?.name ?: session.artistID
     val venue: Venue get() = event.venue(session.venueID)!!
     val item: com.oshicue.kit.core.TimelineItem get() = com.oshicue.kit.core.TimelineItem(id, session.startsAt, session.endsAt)
@@ -151,7 +151,7 @@ fun ScheduleScreen(store: ScheduleStore) {
         }.sortedBy { it.session.startsAt }
     }
     val visibleEntries = allEntries.filter { entry ->
-        if (mine) store.isFavorite(entry.session.artistID) else kind == null || entry.session.kind == kind
+        if (mine) store.isFavorite(entry.id) else kind == null || entry.session.kind == kind
     }
     val conflictCount = remember(visibleEntries) {
         var count = 0
@@ -176,10 +176,10 @@ fun ScheduleScreen(store: ScheduleStore) {
     }
 
     fun toggleFavorite(entry: SessionEntry) {
-        store.toggleFavorite(entry.session.artistID)
+        store.toggleFavorite(entry.id)
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-        toast = L10n.text(if (store.isFavorite(entry.session.artistID)) "schedule.favoriteAdded" else "schedule.favoriteRemoved") +
-            " · " + entry.artist
+        toast = L10n.text(if (store.isFavorite(entry.id)) "schedule.favoriteAdded" else "schedule.favoriteRemoved") +
+            " · " + entry.artist + " · " + L10n.text(if (entry.session.kind == SessionKind.live) "schedule.live" else "schedule.goods")
         toastRequest += 1
     }
 

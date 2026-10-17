@@ -46,6 +46,7 @@ import com.oshicue.kit.core.LedgerCurrency
 import com.oshicue.kit.core.activeMemberships
 import com.oshicue.kit.core.LedgerDates
 import com.oshicue.kit.core.LedgerEvent
+import com.oshicue.kit.core.LedgerPriceSuggestions
 import com.oshicue.kit.core.LedgerRecord
 import com.oshicue.kit.core.favoriteMemberships
 import com.oshicue.kit.core.preferredRecordMembership
@@ -76,20 +77,24 @@ fun LedgerRecordEditor(
     val document = store.document
     val initialMembership = document.preferredRecordMembership(record)
     val initialProduct = record?.productID ?: document.products.firstOrNull()?.id ?: ""
+    val purchaseDate = record?.date ?: date
     val initialCurrency = record?.currency
-        ?: initialMembership?.prices?.firstOrNull { it.productID == initialProduct }?.currency
-        ?: "JPY"
+        ?: LedgerPriceSuggestions.currency(
+            document, initialMembership, initialProduct, purchaseDate, store.lastAddedPrices
+        )
     val initialPrice = record?.unitPriceMinor
-        ?: initialMembership?.prices?.firstOrNull { it.productID == initialProduct && it.currency == initialCurrency }?.unitPriceMinor
+        ?: LedgerPriceSuggestions.price(
+            document, initialMembership, initialProduct, initialCurrency, purchaseDate, store.lastAddedPrices
+        ).unitPriceMinor
 
-    var selectedDate by remember { mutableStateOf(LedgerPresentation.date(date)) }
+    var selectedDate by remember { mutableStateOf(LedgerPresentation.date(purchaseDate)) }
     var membershipID by remember { mutableStateOf(initialMembership?.id ?: "") }
     var productID by remember { mutableStateOf(initialProduct) }
     var currency by remember { mutableStateOf(initialCurrency) }
     var quantity by remember { mutableStateOf((record?.quantity ?: 1).toString()) }
     var price by remember {
         mutableStateOf(
-            initialPrice?.let { LedgerCurrency.fromCode(initialCurrency)?.priceText(it) } ?: ""
+            (LedgerCurrency.fromCode(initialCurrency) ?: LedgerCurrency.JPY).priceText(initialPrice)
         )
     }
     var eventID by remember { mutableStateOf(record?.eventID ?: "") }
@@ -120,10 +125,36 @@ fun LedgerRecordEditor(
     fun isAvailable(item: com.oshicue.kit.core.LedgerMembership): Boolean =
         store.document.activeMemberships.any { it.id == item.id }
 
-    fun prefillPrice() {
-        price = store.document.memberships.firstOrNull { it.id == membershipID }
-            ?.prices?.firstOrNull { it.productID == productID && it.currency == currency }
-            ?.let { selectedCurrency.priceText(it.unitPriceMinor) } ?: ""
+    fun prefillPrice(selectCurrency: Boolean = false) {
+        val day = LedgerPresentation.calendar.format(selectedDate)
+        val currentMembership = store.document.memberships.firstOrNull { it.id == membershipID }
+        if (selectCurrency) {
+            currency = if (record != null &&
+                record.memberID == currentMembership?.memberID &&
+                record.groupID == currentMembership?.groupID &&
+                record.productID == productID
+            ) {
+                record.currency
+            } else {
+                LedgerPriceSuggestions.currency(
+                    store.document, currentMembership, productID, day, store.lastAddedPrices
+                )
+            }
+        }
+        val currentCurrency = LedgerCurrency.fromCode(currency) ?: LedgerCurrency.JPY
+        price = if (record != null &&
+            record.memberID == currentMembership?.memberID &&
+            record.groupID == currentMembership?.groupID &&
+            record.productID == productID &&
+            record.currency == currency
+        ) {
+            currentCurrency.priceText(record.unitPriceMinor)
+        } else {
+            val suggestion = LedgerPriceSuggestions.price(
+                store.document, currentMembership, productID, currency, day, store.lastAddedPrices
+            )
+            currentCurrency.priceText(suggestion.unitPriceMinor)
+        }
     }
 
     fun optional(text: String): String? {
@@ -240,7 +271,7 @@ fun LedgerRecordEditor(
                         label = L10n.text("ledger.type"),
                         value = product?.let { LedgerPresentation.productDisplayName(it) } ?: "",
                         options = store.document.products.map { it.id to LedgerPresentation.productDisplayName(it) },
-                        onSelect = { productID = it; prefillPrice() }
+                        onSelect = { productID = it; prefillPrice(selectCurrency = true) }
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth().clickable { showProductEditor = true }.padding(vertical = 6.dp),
@@ -441,10 +472,20 @@ fun LedgerRecordEditor(
     }
 
     if (showDatePicker) {
-        KitDatePickerDialog(selectedDate, { selectedDate = it }, { showDatePicker = false })
+        KitDatePickerDialog(
+            selectedDate,
+            {
+                selectedDate = it
+                if (record == null) prefillPrice()
+            },
+            { showDatePicker = false }
+        )
     }
     if (showMembershipSelection) {
-        LedgerMembershipSelection(store, record, membershipID, { membershipID = it; prefillPrice() }) {
+        LedgerMembershipSelection(store, record, membershipID, {
+            membershipID = it
+            prefillPrice(selectCurrency = true)
+        }) {
             showMembershipSelection = false
         }
     }
@@ -454,7 +495,7 @@ fun LedgerRecordEditor(
             membership = null,
             onSaved = { id ->
                 membershipID = id
-                prefillPrice()
+                prefillPrice(selectCurrency = true)
             },
             onClose = { showMemberEditor = false }
         )
@@ -465,7 +506,7 @@ fun LedgerRecordEditor(
             product = null,
             onSaved = { id ->
                 productID = id
-                prefillPrice()
+                prefillPrice(selectCurrency = true)
             },
             onClose = { showProductEditor = false }
         )

@@ -25,7 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.GroupRemove
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -67,6 +69,8 @@ import com.oshicue.kit.data.LedgerStore
 import com.oshicue.kit.i18n.L10n
 import com.oshicue.kit.ui.common.KitAlert
 import com.oshicue.kit.ui.common.KitDatePickerDialog
+import com.oshicue.kit.ui.common.KitDemoSection
+import com.oshicue.kit.ui.common.KitDivider
 import com.oshicue.kit.ui.common.KitDropdownRow
 import com.oshicue.kit.ui.common.KitSheet
 import com.oshicue.kit.ui.common.kitStandardSort
@@ -90,7 +94,11 @@ fun LedgerManagementSheet(store: LedgerStore, onClose: () -> Unit) {
                     .background(palette.surfaceMuted, RoundedCornerShape(11.dp))
                     .padding(3.dp)
             ) {
-                for ((index, label) in listOf(L10n.text("management.records"), L10n.text("management.backup")).withIndex()) {
+                for ((index, label) in listOf(
+                    L10n.text("management.records"),
+                    L10n.text("ledger.import"),
+                    L10n.text("management.backup")
+                ).withIndex()) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -105,6 +113,8 @@ fun LedgerManagementSheet(store: LedgerStore, onClose: () -> Unit) {
             }
             if (section == 0) {
                 LedgerRecordManagement(store)
+            } else if (section == 1) {
+                LedgerImportContent(store, onClose)
             } else {
                 LedgerBackupContent(store)
             }
@@ -571,26 +581,14 @@ private fun SelectionRow(id: String, title: String, selected: Boolean, onToggle:
 }
 
 @Composable
-private fun LedgerBackupContent(store: LedgerStore) {
+private fun LedgerImportContent(store: LedgerStore, onApplied: () -> Unit) {
     val palette = kitPalette()
     val context = LocalContext.current
     var text by remember { mutableStateOf("") }
     var preview by remember { mutableStateOf<LedgerDocument?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
-    var pendingExport by remember { mutableStateOf<String?>(null) }
+    var demoError by remember { mutableStateOf<String?>(null) }
     var copied by remember { mutableStateOf(false) }
-
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        val content = pendingExport
-        if (uri != null && content != null) {
-            try {
-                context.contentResolver.openOutputStream(uri)?.use { it.write(content.toByteArray(Charsets.UTF_8)) }
-            } catch (value: Exception) {
-                error = value.message
-            }
-        }
-        pendingExport = null
-    }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (uris.isEmpty()) return@rememberLauncherForActivityResult
@@ -620,34 +618,24 @@ private fun LedgerBackupContent(store: LedgerStore) {
                 modifier = Modifier.size(56.dp).background(palette.surface, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.Inventory, contentDescription = null, tint = palette.accentText, modifier = Modifier.size(26.dp))
+                Icon(Icons.Filled.Download, contentDescription = null, tint = palette.accentText, modifier = Modifier.size(26.dp))
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(L10n.text("ledger.backup"), color = palette.ink, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                Text(L10n.text("ledger.backupHint"), color = palette.muted, fontSize = 12.sp)
+                Text(L10n.text("ledger.import"), color = palette.ink, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Text("JSON · UTF-8", color = palette.muted, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
             }
         }
-        Button(
-            onClick = {
-                try {
-                    pendingExport = LedgerImporter.encode(store.document)
-                    exportLauncher.launch("OshicueKit-ledger-" + LedgerPresentation.calendar.format(LocalDate.now()))
-                } catch (value: Exception) {
-                    error = LedgerPresentation.error(value)
-                }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = palette.surface, contentColor = palette.ink),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth().height(46.dp)
-        ) {
-            Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(L10n.text("ledger.export"))
-        }
-        Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(palette.line))
+        Text(L10n.text("ledger.importHint"), color = palette.muted, fontSize = 12.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(L10n.text("ledger.import"), color = palette.ink, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.clickable { importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.FolderOpen, contentDescription = null, tint = palette.ink, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(L10n.text("ledger.file"), color = palette.ink, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            }
             Spacer(modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier.clickable {
@@ -667,17 +655,8 @@ private fun LedgerBackupContent(store: LedgerStore) {
                     modifier = Modifier.size(15.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(L10n.text(if (copied) "import.copied" else "ledger.copyTemplate"), color = palette.ink, fontSize = 11.sp)
+                Text(L10n.text(if (copied) "import.copied" else "ledger.copyTemplate"), color = palette.ink, fontSize = 12.sp, fontWeight = FontWeight.Medium)
             }
-        }
-        Text(L10n.text("ledger.importHint"), color = palette.muted, fontSize = 12.sp)
-        Row(
-            modifier = Modifier.clickable { importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Filled.FolderOpen, contentDescription = null, tint = palette.ink, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(L10n.text("ledger.file"), color = palette.ink, fontSize = 14.sp)
         }
         androidx.compose.material3.TextField(
             value = text,
@@ -744,8 +723,7 @@ private fun LedgerBackupContent(store: LedgerStore) {
                 Button(
                     onClick = {
                         if (store.importDocument(document)) {
-                            preview = null
-                            text = ""
+                            onApplied()
                         } else {
                             error = store.storageError
                         }
@@ -755,6 +733,89 @@ private fun LedgerBackupContent(store: LedgerStore) {
                     modifier = Modifier.fillMaxWidth().height(46.dp)
                 ) { Text(L10n.text("ledger.apply"), fontWeight = FontWeight.SemiBold) }
             }
+        }
+        KitDivider()
+        KitDemoSection(
+            title = L10n.text("ledger.title"),
+            actionLabel = L10n.text("settings.ledgerDemo"),
+            hint = L10n.text("ledger.loadDemoHint"),
+            icon = Icons.Filled.Group,
+            error = demoError
+        ) {
+            if (store.loadDemo()) {
+                onApplied()
+            } else {
+                demoError = store.storageError
+                store.storageError = null
+            }
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+    }
+}
+
+@Composable
+private fun LedgerBackupContent(store: LedgerStore) {
+    val palette = kitPalette()
+    val context = LocalContext.current
+    var error by remember { mutableStateOf<String?>(null) }
+    var pendingExport by remember { mutableStateOf<String?>(null) }
+
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        val content = pendingExport
+        if (uri != null && content != null) {
+            try {
+                context.contentResolver.openOutputStream(uri)?.use { it.write(content.toByteArray(Charsets.UTF_8)) }
+            } catch (value: Exception) {
+                error = value.message
+            }
+        }
+        pendingExport = null
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier.size(56.dp).background(palette.surface, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.Inventory, contentDescription = null, tint = palette.accentText, modifier = Modifier.size(26.dp))
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(L10n.text("ledger.backup"), color = palette.ink, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.text("ledger.backupHint"), color = palette.muted, fontSize = 12.sp)
+            }
+        }
+        Button(
+            onClick = {
+                try {
+                    pendingExport = LedgerImporter.encode(store.document)
+                    exportLauncher.launch("OshicueKit-ledger-" + LedgerPresentation.calendar.format(LocalDate.now()))
+                } catch (value: Exception) {
+                    error = LedgerPresentation.error(value)
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = palette.surface, contentColor = palette.ink),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth().height(46.dp)
+        ) {
+            Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(L10n.text("ledger.export"))
+        }
+        error?.let { message ->
+            Text(
+                message,
+                color = palette.warningText,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(palette.warningText.copy(alpha = 0.06f), RoundedCornerShape(12.dp))
+                    .padding(12.dp)
+            )
         }
         Spacer(modifier = Modifier.height(30.dp))
     }
