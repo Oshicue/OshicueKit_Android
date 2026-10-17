@@ -5,6 +5,7 @@ import com.oshicue.kit.core.FestivalEvent
 import com.oshicue.kit.core.FestivalSession
 import com.oshicue.kit.core.ScheduleDates
 import com.oshicue.kit.core.ScheduleDocument
+import com.oshicue.kit.core.ScheduleFavorites
 import com.oshicue.kit.core.ScheduleImporter
 import com.oshicue.kit.core.SessionKind
 import com.oshicue.kit.core.Venue
@@ -15,6 +16,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ScheduleDeletionTests {
+    private fun favorite(eventID: String, index: Int = 0): String = ScheduleFavorites.id(eventID, "$eventID-session-$index")
+
     private fun event(id: String, artistIDs: List<String>): FestivalEvent {
         val venueID = "$id-venue"
         val start = ScheduleDates.parseTimestamp("2026-10-14T12:00:00+09:00")!!
@@ -47,7 +50,7 @@ class ScheduleDeletionTests {
         val last = event("last", listOf("last-artist"))
         val original = ScheduleDocument(events = listOf(first, middle, last))
 
-        val deleted = original.deletingEvent("middle", setOf("middle-live"))!!
+        val deleted = original.deletingEvent("middle", setOf(favorite("middle")))!!
 
         assertEquals(listOf(first, last), deleted.document.events)
         assertEquals(first.venues + last.venues, deleted.document.events.flatMap { it.venues })
@@ -66,26 +69,30 @@ class ScheduleDeletionTests {
     }
 
     @Test
-    fun testSharedArtistFavoriteRemainsAndRemovedArtistFavoriteIsPruned() {
+    fun testDeletionKeepsOnlySelectedSessionsFromRemainingEvents() {
         val removed = event("removed", listOf("shared-artist", "removed-only"))
         val retained = event("retained", listOf("shared-artist", "retained-only"))
         val original = ScheduleDocument(events = listOf(removed, retained))
 
-        val deleted = original.deletingEvent("removed", setOf("shared-artist", "removed-only", "retained-only", "stale-artist"))!!
+        val deleted = original.deletingEvent(
+            "removed",
+            setOf(favorite("removed"), favorite("removed", 1), favorite("retained"), favorite("retained", 1), "stale-session")
+        )!!
 
-        assertEquals(setOf("shared-artist", "retained-only"), deleted.favorites)
+        assertEquals(setOf(favorite("retained"), favorite("retained", 1)), deleted.favorites)
         assertEquals(listOf(retained), deleted.document.events)
     }
 
     @Test
-    fun testFavoriteUsesCanonicalArtistIDRatherThanMatchingName() {
-        var removed = event("removed", listOf("first-person"))
-        var retained = event("retained", listOf("second-person"))
-        removed = removed.copy(artists = listOf(Artist("first-person", "Same Stage Name")))
-        retained = retained.copy(artists = listOf(Artist("second-person", "Same Stage Name")))
+    fun testSameArtistAndSessionIDsDoNotShareSelectionsAcrossEvents() {
+        val removed = event("removed", listOf("shared-artist"))
+        val retainedEvent = event("retained", listOf("shared-artist"))
+        val retained = retainedEvent.copy(
+            sessions = retainedEvent.sessions.toMutableList().also { it[0] = it[0].copy(id = removed.sessions[0].id) }
+        )
         val original = ScheduleDocument(events = listOf(removed, retained))
 
-        val deleted = original.deletingEvent("removed", setOf("first-person"))!!
+        val deleted = original.deletingEvent("removed", setOf(favorite("removed")))!!
 
         assertTrue(deleted.favorites.isEmpty())
         assertEquals(listOf(retained), deleted.document.events)
@@ -95,19 +102,19 @@ class ScheduleDeletionTests {
     fun testDeletingLastTimetableProducesValidEmptyDocumentRoundTrip() {
         val original = ScheduleDocument(events = listOf(event("only", listOf("artist"))))
 
-        val deleted = original.deletingEvent("only", setOf("artist"))!!
+        val deleted = original.deletingEvent("only", setOf(favorite("only")))!!
 
         assertEquals(ScheduleDocument(events = emptyList()), deleted.document)
         assertTrue(deleted.favorites.isEmpty())
         val json = ScheduleImporter.encode(deleted.document)
         assertEquals(deleted.document, ScheduleImporter.parse(json))
-        assertNull(deleted.document.deletingEvent("only", setOf("stale-artist")))
+        assertNull(deleted.document.deletingEvent("only", setOf("stale-session")))
     }
 
     @Test
     fun testUnknownEventDoesNotChangeDocumentOrPruneFavorites() {
         val original = ScheduleDocument(events = listOf(event("retained", listOf("artist"))))
-        val favorites = setOf("artist", "stale-artist")
+        val favorites = setOf(favorite("retained"), "stale-session")
         val document = original
         val savedFavorites = favorites
         assertNull(original.deletingEvent("missing", favorites))
