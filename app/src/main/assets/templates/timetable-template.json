@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "example-idol-festival-2026",
+      "name": "示例偶像音乐节",
+      "city": "Tokyo",
+      "timeZone": "Asia/Tokyo",
+      "venues": [
+        { "id": "main-hall", "name": "MAIN HALL", "color": "#78C9EB" },
+        { "id": "garden-stage", "name": "GARDEN STAGE", "color": "#94C988" }
+      ],
+      "artists": [
+        { "id": "neon-parade", "name": "NEON PARADE" },
+        { "id": "tsuki-no-atelier", "name": "月のアトリエ" }
+      ],
+      "sessions": [
+        {
+          "id": "neon-parade-live-day1",
+          "artistID": "neon-parade",
+          "venueID": "main-hall",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:00:00+09:00",
+          "endsAt": "2026-10-14T12:30:00+09:00",
+          "notes": "此处填写入场或摄影规则。"
+        },
+        {
+          "id": "neon-parade-goods-day1",
+          "artistID": "neon-parade",
+          "venueID": "main-hall",
+          "kind": "goods",
+          "startsAt": "2026-10-14T12:45:00+09:00",
+          "endsAt": "2026-10-14T13:45:00+09:00",
+          "area": "物贩区 1"
+        },
+        {
+          "id": "tsuki-no-atelier-live-day1",
+          "artistID": "tsuki-no-atelier",
+          "venueID": "garden-stage",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:15:00+09:00",
+          "endsAt": "2026-10-14T12:50:00+09:00"
+        },
+        {
+          "id": "tsuki-no-atelier-live-day2",
+          "artistID": "tsuki-no-atelier",
+          "venueID": "garden-stage",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:00:00+09:00",
+          "endsAt": "2026-10-15T12:30:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "example-night-session-2026",
+      "name": "示例夜场活动",
+      "city": "Tokyo",
+      "timeZone": "Asia/Tokyo",
+      "venues": [
+        { "id": "night-club", "name": "NIGHT CLUB", "color": "#F4A174" }
+      ],
+      "artists": [
+        { "id": "neon-parade", "name": "NEON PARADE" }
+      ],
+      "sessions": [
+        {
+          "id": "neon-parade-live-night",
+          "artistID": "neon-parade",
+          "venueID": "night-club",
+          "kind": "live",
+          "startsAt": "2026-10-14T23:40:00+09:00",
+          "endsAt": "2026-10-15T00:20:00+09:00",
+          "notes": "跨午夜场次：结束日期必须写成次日。"
+        }
+      ]
+    }
+  ]
+}

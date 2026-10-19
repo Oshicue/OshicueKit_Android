@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "demo-tokyo-idol-circuit",
+      "name": "TOKYO IDOL CIRCUIT",
+      "city": "Tokyo",
+      "timeZone": "Asia/Tokyo",
+      "venues": [
+        {
+          "id": "sky-hall",
+          "name": "SKY HALL",
+          "color": "#78C9EB"
+        },
+        {
+          "id": "orbit-stage",
+          "name": "ORBIT STAGE",
+          "color": "#F4A174"
+        },
+        {
+          "id": "mint-room",
+          "name": "MINT ROOM",
+          "color": "#94C988"
+        },
+        {
+          "id": "petal-club",
+          "name": "PETAL CLUB",
+          "color": "#C58EC4"
+        },
+        {
+          "id": "sunny-studio",
+          "name": "SUNNY STUDIO",
+          "color": "#EECF67"
+        }
+      ],
+      "artists": [
+        {
+          "id": "hoshiiro-note",
+          "name": "星色ノート"
+        },
+        {
+          "id": "parallel-days",
+          "name": "PARALLEL DAYS"
+        },
+        {
+          "id": "mint-signal",
+          "name": "ミントシグナル"
+        },
+        {
+          "id": "luna-palette",
+          "name": "LUNA PALETTE"
+        },
+        {
+          "id": "sora-melody",
+          "name": "そらメロディ"
+        },
+        {
+          "id": "neon-ribbon",
+          "name": "NEON RIBBON"
+        },
+        {
+          "id": "little-compass",
+          "name": "リトルコンパス"
+        },
+        {
+          "id": "sugar-orbit",
+          "name": "SUGAR ORBIT"
+        }
+      ],
+      "sessions": [
+        {
+          "id": "day1-live-0",
+          "artistID": "hoshiiro-note",
+          "venueID": "sky-hall",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:00:00+09:00",
+          "endsAt": "2026-10-14T12:40:00+09:00"
+        },
+        {
+          "id": "day1-goods-0",
+          "artistID": "hoshiiro-note",
+          "venueID": "sky-hall",
+          "kind": "goods",
+          "startsAt": "2026-10-14T12:50:00+09:00",
+          "endsAt": "2026-10-14T13:45:00+09:00",
+          "area": "1"
+        },
+        {
+          "id": "day1-live-late-0",
+          "artistID": "luna-palette",
+          "venueID": "sky-hall",
+          "kind": "live",
+          "startsAt": "2026-10-14T13:25:00+09:00",
+          "endsAt": "2026-10-14T14:00:00+09:00"
+        },
+        {
+          "id": "day2-live-0",
+          "artistID": "hoshiiro-note",
+          "venueID": "sky-hall",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:00:00+09:00",
+          "endsAt": "2026-10-15T12:35:00+09:00"
+        },
+        {
+          "id": "day2-goods-0",
+          "artistID": "hoshiiro-note",
+          "venueID": "sky-hall",
+          "kind": "goods",
+          "startsAt": "2026-10-15T12:45:00+09:00",
+          "endsAt": "2026-10-15T13:35:00+09:00",
+          "area": "1"
+        },
+        {
+          "id": "day1-live-1",
+          "artistID": "parallel-days",
+          "venueID": "orbit-stage",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:10:00+09:00",
+          "endsAt": "2026-10-14T12:50:00+09:00"
+        },
+        {
+          "id": "day1-goods-1",
+          "artistID": "parallel-days",
+          "venueID": "orbit-stage",
+          "kind": "goods",
+          "startsAt": "2026-10-14T13:00:00+09:00",
+          "endsAt": "2026-10-14T13:55:00+09:00",
+          "area": "2"
+        },
+        {
+          "id": "day1-live-late-1",
+          "artistID": "sora-melody",
+          "venueID": "orbit-stage",
+          "kind": "live",
+          "startsAt": "2026-10-14T13:33:00+09:00",
+          "endsAt": "2026-10-14T14:08:00+09:00"
+        },
+        {
+          "id": "day2-live-1",
+          "artistID": "parallel-days",
+          "venueID": "orbit-stage",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:12:00+09:00",
+          "endsAt": "2026-10-15T12:47:00+09:00"
+        },
+        {
+          "id": "day2-goods-1",
+          "artistID": "parallel-days",
+          "venueID": "orbit-stage",
+          "kind": "goods",
+          "startsAt": "2026-10-15T12:57:00+09:00",
+          "endsAt": "2026-10-15T13:47:00+09:00",
+          "area": "2"
+        },
+        {
+          "id": "day1-live-2",
+          "artistID": "mint-signal",
+          "venueID": "mint-room",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:20:00+09:00",
+          "endsAt": "2026-10-14T13:00:00+09:00"
+        },
+        {
+          "id": "day1-goods-2",
+          "artistID": "mint-signal",
+          "venueID": "mint-room",
+          "kind": "goods",
+          "startsAt": "2026-10-14T13:10:00+09:00",
+          "endsAt": "2026-10-14T14:05:00+09:00",
+          "area": "3"
+        },
+        {
+          "id": "day1-live-late-2",
+          "artistID": "neon-ribbon",
+          "venueID": "mint-room",
+          "kind": "live",
+          "startsAt": "2026-10-14T13:41:00+09:00",
+          "endsAt": "2026-10-14T14:16:00+09:00"
+        },
+        {
+          "id": "day2-live-2",
+          "artistID": "mint-signal",
+          "venueID": "mint-room",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:24:00+09:00",
+          "endsAt": "2026-10-15T12:59:00+09:00"
+        },
+        {
+          "id": "day2-goods-2",
+          "artistID": "mint-signal",
+          "venueID": "mint-room",
+          "kind": "goods",
+          "startsAt": "2026-10-15T13:09:00+09:00",
+          "endsAt": "2026-10-15T13:59:00+09:00",
+          "area": "3"
+        },
+        {
+          "id": "day1-live-3",
+          "artistID": "luna-palette",
+          "venueID": "petal-club",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:30:00+09:00",
+          "endsAt": "2026-10-14T13:10:00+09:00"
+        },
+        {
+          "id": "day1-goods-3",
+          "artistID": "luna-palette",
+          "venueID": "petal-club",
+          "kind": "goods",
+          "startsAt": "2026-10-14T13:20:00+09:00",
+          "endsAt": "2026-10-14T14:15:00+09:00",
+          "area": "4"
+        },
+        {
+          "id": "day1-live-late-3",
+          "artistID": "little-compass",
+          "venueID": "petal-club",
+          "kind": "live",
+          "startsAt": "2026-10-14T13:49:00+09:00",
+          "endsAt": "2026-10-14T14:24:00+09:00"
+        },
+        {
+          "id": "day2-live-3",
+          "artistID": "luna-palette",
+          "venueID": "petal-club",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:36:00+09:00",
+          "endsAt": "2026-10-15T13:11:00+09:00"
+        },
+        {
+          "id": "day2-goods-3",
+          "artistID": "luna-palette",
+          "venueID": "petal-club",
+          "kind": "goods",
+          "startsAt": "2026-10-15T13:21:00+09:00",
+          "endsAt": "2026-10-15T14:11:00+09:00",
+          "area": "4"
+        },
+        {
+          "id": "day1-live-4",
+          "artistID": "sora-melody",
+          "venueID": "sunny-studio",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:40:00+09:00",
+          "endsAt": "2026-10-14T13:20:00+09:00"
+        },
+        {
+          "id": "day1-goods-4",
+          "artistID": "sora-melody",
+          "venueID": "sunny-studio",
+          "kind": "goods",
+          "startsAt": "2026-10-14T13:30:00+09:00",
+          "endsAt": "2026-10-14T14:25:00+09:00",
+          "area": "5"
+        },
+        {
+          "id": "day1-live-late-4",
+          "artistID": "sugar-orbit",
+          "venueID": "sunny-studio",
+          "kind": "live",
+          "startsAt": "2026-10-14T13:57:00+09:00",
+          "endsAt": "2026-10-14T14:32:00+09:00"
+        },
+        {
+          "id": "day2-live-4",
+          "artistID": "sora-melody",
+          "venueID": "sunny-studio",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:48:00+09:00",
+          "endsAt": "2026-10-15T13:23:00+09:00"
+        },
+        {
+          "id": "day2-goods-4",
+          "artistID": "sora-melody",
+          "venueID": "sunny-studio",
+          "kind": "goods",
+          "startsAt": "2026-10-15T13:33:00+09:00",
+          "endsAt": "2026-10-15T14:23:00+09:00",
+          "area": "5"
+        }
+      ]
+    },
+    {
+      "id": "demo-river-pop",
+      "name": "SHIBUYA NIGHT SESSION",
+      "city": "Tokyo",
+      "timeZone": "Asia/Tokyo",
+      "venues": [
+        {
+          "id": "river-loft",
+          "name": "RIVER LOFT",
+          "color": "#E789A5"
+        }
+      ],
+      "artists": [
+        {
+          "id": "hoshiiro-note",
+          "name": "星色ノート"
+        },
+        {
+          "id": "neon-ribbon",
+          "name": "NEON RIBBON"
+        }
+      ],
+      "sessions": [
+        {
+          "id": "river-live-1",
+          "artistID": "hoshiiro-note",
+          "venueID": "river-loft",
+          "kind": "live",
+          "startsAt": "2026-10-14T12:30:00+09:00",
+          "endsAt": "2026-10-14T13:05:00+09:00"
+        },
+        {
+          "id": "river-goods-1",
+          "artistID": "hoshiiro-note",
+          "venueID": "river-loft",
+          "kind": "goods",
+          "startsAt": "2026-10-14T13:15:00+09:00",
+          "endsAt": "2026-10-14T14:05:00+09:00",
+          "area": "A"
+        },
+        {
+          "id": "river-live-2",
+          "artistID": "neon-ribbon",
+          "venueID": "river-loft",
+          "kind": "live",
+          "startsAt": "2026-10-15T12:00:00+09:00",
+          "endsAt": "2026-10-15T12:40:00+09:00"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "tokyo-flight-2026-11-21",
+      "kind": "flight",
+      "title": "赴东京航班（虚构时刻）",
+      "startsAt": "2026-11-21T09:00:00+08:00",
+      "endsAt": "2026-11-21T13:00:00+09:00",
+      "timeZone": "Asia/Shanghai",
+      "isAllDay": false,
+      "city": {
+        "name": "上海",
+        "country": "中国"
+      },
+      "location": {
+        "name": "上海浦东国际机场 PVG",
+        "address": "中国上海市浦东新区迎宾大道 6000 号",
+        "latitude": 31.1443,
+        "longitude": 121.8083
+      },
+      "notes": "全部时间与活动均为虚构示例，不代表实际航班或场馆安排；请核实后替换。",
+      "flights": [
+        {
+          "number": "NH 920",
+          "airline": "ANA",
+          "departureAirport": "上海浦东 PVG",
+          "arrivalAirport": "东京成田 NRT",
+          "departureAt": "2026-11-21T09:00:00+08:00",
+          "arrivalAt": "2026-11-21T13:00:00+09:00",
+          "departureTimeZone": "Asia/Shanghai",
+          "arrivalTimeZone": "Asia/Tokyo",
+          "departureLocation": {
+            "name": "上海浦东国际机场 PVG",
+            "address": "中国上海市浦东新区迎宾大道 6000 号",
+            "latitude": 31.1443,
+            "longitude": 121.8083
+          },
+          "arrivalLocation": {
+            "name": "成田国际机场 NRT",
+            "address": "日本千叶县成田市古込 1-1",
+            "latitude": 35.772,
+            "longitude": 140.3929
+          }
+        }
+      ]
+    },
+    {
+      "id": "tokyo-hotel-2026-11-21",
+      "kind": "hotel",
+      "title": "东京住宿（示例）",
+      "startsAt": "2026-11-21T15:00:00+09:00",
+      "endsAt": "2026-11-22T10:00:00+09:00",
+      "timeZone": "Asia/Tokyo",
+      "isAllDay": false,
+      "city": {
+        "name": "东京",
+        "country": "日本"
+      },
+      "location": {
+        "name": "东京站酒店（示例地点）",
+        "address": "日本东京都千代田区丸之内 1-9-1",
+        "latitude": 35.6812,
+        "longitude": 139.7671
+      }
+    },
+    {
+      "id": "tokyo-lunch-2026-11-21",
+      "kind": "restaurant",
+      "title": "演出前用餐（示例）",
+      "startsAt": "2026-11-21T15:45:00+09:00",
+      "endsAt": "2026-11-21T16:30:00+09:00",
+      "timeZone": "Asia/Tokyo",
+      "isAllDay": false,
+      "city": {
+        "name": "东京",
+        "country": "日本"
+      },
+      "location": {
+        "name": "有乐町餐厅（示例地点）",
+        "address": "日本东京都千代田区有乐町 2-9",
+        "latitude": 35.675,
+        "longitude": 139.7634
+      }
+    },
+    {
+      "id": "tokyo-live-2026-11-21",
+      "kind": "live",
+      "title": "东京周末演出",
+      "startsAt": "2026-11-21T17:00:00+09:00",
+      "endsAt": "2026-11-21T18:00:00+09:00",
+      "timeZone": "Asia/Tokyo",
+      "isAllDay": false,
+      "city": {
+        "name": "东京",
+        "country": "日本"
+      },
+      "location": {
+        "name": "东京国际论坛（示例演出）",
+        "address": "日本东京都千代田区丸之内 3-5-1",
+        "latitude": 35.6769,
+        "longitude": 139.764
+      }
+    },
+    {
+      "id": "tokyo-live-evening-2026-11-21",
+      "kind": "live",
+      "title": "东京周末演出（第二场示例）",
+      "startsAt": "2026-11-21T19:00:00+09:00",
+      "endsAt": "2026-11-21T20:00:00+09:00",
+      "timeZone": "Asia/Tokyo",
+      "isAllDay": false,
+      "city": {
+        "name": "东京",
+        "country": "日本"
+      },
+      "location": {
+        "name": "日比谷公会堂（示例演出）",
+        "address": "日本东京都千代田区日比谷公园 1-3",
+        "latitude": 35.6717,
+        "longitude": 139.757
+      }
+    },
+    {
+      "id": "tokyo-other-2026-11-21",
+      "kind": "other",
+      "title": "公园散步（示例）",
+      "startsAt": "2026-11-21T20:30:00+09:00",
+      "endsAt": "2026-11-21T21:00:00+09:00",
+      "timeZone": "Asia/Tokyo",
+      "isAllDay": false,
+      "city": {
+        "name": "东京",
+        "country": "日本"
+      },
+      "location": {
+        "name": "日比谷公园（示例散步）",
+        "address": "日本东京都千代田区日比谷公园 1",
+        "latitude": 35.6738,
+        "longitude": 139.7562
+      }
+    }
+  ]
+}
